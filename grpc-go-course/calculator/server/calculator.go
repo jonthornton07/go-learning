@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	pb "grpc/calculator/proto"
+	"io"
 	"log"
 )
 
@@ -32,4 +33,28 @@ func (s *Server) Primes(in *pb.PrimeRequest, stream pb.CalculatorService_PrimesS
 	}
 
 	return nil
+}
+
+func (s *Server) Average(stream pb.CalculatorService_AverageServer) error {
+	log.Printf("LongGreet function was invoked")
+
+	sum := 0
+	count := 0
+
+	for {
+		req, err := stream.Recv()
+
+		if err == io.EOF {
+			return stream.SendAndClose(&pb.AverageResponse{
+				Result: float64(sum) / float64(count),
+			})
+		}
+
+		if err != nil {
+			log.Fatalf("Error reading client stream: %v\n", err)
+		}
+
+		sum += int(req.Number)
+		count++
+	}
 }

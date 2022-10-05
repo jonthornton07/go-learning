@@ -5,6 +5,7 @@ import (
 	pb "grpc/calculator/proto"
 	"io"
 	"log"
+	"time"
 )
 
 func doAdd(c pb.CalculatorServiceClient) {
@@ -47,4 +48,34 @@ func doPrimes(c pb.CalculatorServiceClient) {
 
 		log.Printf("Prime Result: %d\n", msg.Result)
 	}
+}
+
+func doAverage(c pb.CalculatorServiceClient) {
+	log.Println("doAverage was invoked")
+
+	reqs := []*pb.AverageRequest{
+		{Number: 2},
+		{Number: 4},
+		{Number: 6},
+	}
+
+	stream, err := c.Average(context.Background())
+
+	for _, req := range reqs {
+		log.Printf("Sending req: %v\n", req)
+		stream.Send(req)
+		time.Sleep(1 * time.Second)
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	res, err := stream.CloseAndRecv()
+
+	if err != nil {
+		log.Fatalf("Error Reading Stream: %v\n", err)
+	}
+
+	log.Printf("doAverage: %f\n", res.Result)
 }
