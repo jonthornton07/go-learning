@@ -79,3 +79,52 @@ func doAverage(c pb.CalculatorServiceClient) {
 
 	log.Printf("doAverage: %f\n", res.Result)
 }
+
+func doRunningMax(c pb.CalculatorServiceClient) {
+	log.Println("doGreetEveryone was invoked")
+
+	stream, err := c.RunningMax(context.Background())
+
+	if err != nil {
+		log.Fatalf("Error while creating stream: %v\n", err)
+	}
+
+	reqs := []*pb.RunningMaxRequest{
+		{Number: 1},
+		{Number: 5},
+		{Number: 3},
+		{Number: 6},
+		{Number: 2},
+		{Number: 20},
+	}
+
+	waitc := make(chan struct{})
+
+	go func() {
+		for _, req := range reqs {
+			log.Printf("Send Request: %s\n", req)
+			stream.Send(req)
+			time.Sleep(1 * time.Second)
+		}
+		stream.CloseSend()
+	}()
+
+	go func() {
+		for {
+			msg, err := stream.Recv()
+
+			if err == io.EOF {
+				break
+			}
+
+			if err != nil {
+				log.Fatalf("Error Reading Stream: %v\n", err)
+			}
+
+			log.Printf("Current Max: %d\n", msg.Result)
+		}
+		close(waitc)
+	}()
+
+	<-waitc
+}

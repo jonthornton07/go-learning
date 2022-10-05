@@ -58,3 +58,34 @@ func (s *Server) Average(stream pb.CalculatorService_AverageServer) error {
 		count++
 	}
 }
+
+func (s *Server) RunningMax(stream pb.CalculatorService_RunningMaxServer) error {
+	log.Printf("RunningMax function was invoked")
+
+	runningMax := int64(0)
+
+	for {
+		req, err := stream.Recv()
+
+		if err == io.EOF {
+			return nil
+		}
+
+		if err != nil {
+			log.Fatalf("Error reading client stream: %v\n", err)
+		}
+
+		if req.Number > runningMax {
+			runningMax = req.Number
+
+			err = stream.Send(&pb.RunningMaxResponse{
+				Result: runningMax,
+			})
+
+			if err != nil {
+				log.Fatalf("Error while sending data to client: %v\n", err)
+			}
+		}
+
+	}
+}

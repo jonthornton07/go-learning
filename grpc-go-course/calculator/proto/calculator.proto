@@ -29,8 +29,17 @@ message AverageResponse {
     double result = 1;
 }
 
+message RunningMaxRequest {
+    int64 number = 1;
+}
+
+message RunningMaxResponse {
+    int64 result = 1;
+}
+
 service CalculatorService {
     rpc Add (SumRequest) returns (SumResponse);
     rpc Primes (PrimeRequest) returns (stream PrimeResponse);
     rpc Average (stream AverageRequest) returns (AverageResponse);
+    rpc RunningMax (stream RunningMaxRequest) returns (stream RunningMaxResponse);
 }

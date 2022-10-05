@@ -24,4 +24,5 @@ func main() {
 	doAdd(c)
 	doPrimes(c)
 	doAverage(c)
+	doRunningMax(c)
 }
