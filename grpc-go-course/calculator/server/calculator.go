@@ -2,9 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	pb "grpc/calculator/proto"
 	"io"
 	"log"
+	"math"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *Server) Add(ctx context.Context, in *pb.SumRequest) (*pb.SumResponse, error) {
@@ -36,7 +41,7 @@ func (s *Server) Primes(in *pb.PrimeRequest, stream pb.CalculatorService_PrimesS
 }
 
 func (s *Server) Average(stream pb.CalculatorService_AverageServer) error {
-	log.Printf("LongGreet function was invoked")
+	log.Printf("Average function was invoked")
 
 	sum := 0
 	count := 0
@@ -88,4 +93,21 @@ func (s *Server) RunningMax(stream pb.CalculatorService_RunningMaxServer) error 
 		}
 
 	}
+}
+
+func (s *Server) SqRt(ctx context.Context, in *pb.SqRtRequest) (*pb.SqRtRespone, error) {
+	log.Printf("SqRt function was invoked %v\n", in)
+
+	number := in.Number
+
+	if number < 0 {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			fmt.Sprintf("Received a negative number: %d", number),
+		)
+	}
+
+	return &pb.SqRtRespone{
+		Result: math.Sqrt(float64(number)),
+	}, nil
 }

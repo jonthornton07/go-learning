@@ -25,4 +25,6 @@ func main() {
 	doPrimes(c)
 	doAverage(c)
 	doRunningMax(c)
+	doSqRt(c, 10)
+	doSqRt(c, -10)
 }

@@ -37,9 +37,18 @@ message RunningMaxResponse {
     int64 result = 1;
 }
 
+message SqRtRequest {
+    int64 number = 1; //could be uint32 to prevent negative numbers
+}
+
+message SqRtRespone {
+    double result = 1;
+}
+
 service CalculatorService {
     rpc Add (SumRequest) returns (SumResponse);
     rpc Primes (PrimeRequest) returns (stream PrimeResponse);
     rpc Average (stream AverageRequest) returns (AverageResponse);
     rpc RunningMax (stream RunningMaxRequest) returns (stream RunningMaxResponse);
+    rpc SqRt (SqRtRequest) returns (SqRtRespone);
 }
